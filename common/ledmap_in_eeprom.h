@@ -4,7 +4,11 @@
 #include "ledmap.h"
 
 #ifndef EECONFIG_LEDMAP_IN_EEPROM
+#ifdef PS2_MOUSE_ENABLE
+#define EECONFIG_LEDMAP_IN_EEPROM 8
+#else
 #define EECONFIG_LEDMAP_IN_EEPROM 7
+#endif
 #endif
 
 #define EECONFIG_LEDMAP (uint16_t*)EECONFIG_LEDMAP_IN_EEPROM

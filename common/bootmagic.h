@@ -93,6 +93,13 @@
 #define BOOTMAGIC_KEY_DEFAULT_LAYER_7   KC_7
 #endif
 
+/*
+ * ps/2 mouse
+ */
+#ifndef BOOTMAGIC_KEY_PS2_MOUSE_ENABLE
+#define BOOTMAGIC_KEY_PS2_MOUSE_ENABLE  KC_P
+#endif
+
 
 void bootmagic(void);
 bool bootmagic_scan_keycode(uint8_t keycode);

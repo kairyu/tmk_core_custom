@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EECONFIG_KEYMAP                             (uint8_t *)4
 #define EECONFIG_MOUSEKEY_ACCEL                     (uint8_t *)5
 #define EECONFIG_BACKLIGHT                          (uint8_t *)6
+#define EECONFIG_PS2_MOUSE                          (uint8_t *)7
 
 
 /* debug bit */
@@ -49,6 +50,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EECONFIG_KEYMAP_SWAP_BACKSLASH_BACKSPACE    (1<<6)
 #define EECONFIG_KEYMAP_NKRO                        (1<<7)
 
+/* ps/2 mouse bit */
+#define EECONFIG_PS2_MOUSE_ENABLE                   (1<<0)
 
 bool eeconfig_is_enabled(void);
 
@@ -70,6 +73,11 @@ void eeconfig_write_keymap(uint8_t val);
 #ifdef BACKLIGHT_ENABLE
 uint8_t eeconfig_read_backlight(void);
 void eeconfig_write_backlight(uint8_t val);
+#endif
+
+#ifdef PS2_MOUSE_ENABLE
+uint8_t eeconfig_read_ps2_mouse(void);
+void eeconfig_write_ps2_mouse(uint8_t val);
 #endif
 
 #endif

@@ -12,6 +12,9 @@
 #include "ledmap_in_eeprom.h"
 #include "bootmagic.h"
 
+#ifdef PS2_MOUSE_ENABLE
+extern uint8_t ps2_mouse_enabled;
+#endif
 
 void bootmagic(void)
 {
@@ -112,6 +115,14 @@ void bootmagic(void)
         default_layer = eeconfig_read_default_layer();
         default_layer_set((uint32_t)default_layer);
     }
+
+#ifdef PS2_MOUSE_ENABLE
+    ps2_mouse_enabled = eeconfig_read_ps2_mouse();
+    if (bootmagic_scan_keycode(BOOTMAGIC_KEY_PS2_MOUSE_ENABLE)) {
+        ps2_mouse_enabled = !ps2_mouse_enabled;
+    }
+    eeconfig_write_ps2_mouse(ps2_mouse_enabled);
+#endif
 }
 
 static bool scan_keycode(uint8_t keycode)
