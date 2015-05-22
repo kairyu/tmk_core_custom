@@ -124,6 +124,7 @@ CFLAGS += -O$(OPT)
 CFLAGS += -funsigned-char
 CFLAGS += -funsigned-bitfields
 CFLAGS += -ffunction-sections
+CFLAGS += -fdata-sections
 CFLAGS += -fno-inline-small-functions
 CFLAGS += -fpack-struct
 CFLAGS += -fshort-enums
@@ -440,7 +441,11 @@ flip-ee: $(TARGET).hex $(TARGET).eep
 	$(REMOVE) $(TARGET)eep.hex
 
 dfu-ee: $(TARGET).hex $(TARGET).eep
-	dfu-programmer $(MCU) eeprom-flash $(TARGET).eep
+ifneq (, $(findstring 0.7, $(shell dfu-programmer --version 2>&1)))
+	dfu-programmer $(MCU) flash --eeprom $(TARGET).eep
+else
+	dfu-programmer $(MCU) flash-eeprom $(TARGET).eep
+endif
 	dfu-programmer $(MCU) reset
 
 

@@ -11,6 +11,10 @@ ifdef MOUSEKEY_ENABLE
     SRC += $(PJRC_DIR)/usb_mouse.c
 endif
 
+ifdef ADB_MOUSE_ENABLE
+    SRC += $(PJRC_DIR)/usb_mouse.c
+endif
+
 ifdef PS2_MOUSE_ENABLE
     SRC += $(PJRC_DIR)/usb_mouse.c
 endif
@@ -20,7 +24,7 @@ ifdef EXTRAKEY_ENABLE
 endif
 
 # Search Path
-VPATH += $(TOP_DIR)/$(PJRC_DIR)
+VPATH += $(TMK_DIR)/$(PJRC_DIR)
 
 # This indicates using LUFA stack
 OPT_DEFS += -DPROTOCOL_PJRC

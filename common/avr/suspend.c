@@ -30,6 +30,7 @@ __asm__ __volatile__ (  \
     : "r0"  \
 )
 
+
 void suspend_idle(uint8_t time)
 {
     cli();

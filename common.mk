@@ -23,7 +23,7 @@ ifdef BOOTMAGIC_ENABLE
     OPT_DEFS += -DBOOTMAGIC_ENABLE
 endif
 
-ifdef $(or MOUSEKEY_ENABLE, PS2_MOUSE_ENABLE)
+ifdef MOUSEKEY_ENABLE
     SRC += $(COMMON_DIR)/mousekey.c
     OPT_DEFS += -DMOUSEKEY_ENABLE
     OPT_DEFS += -DMOUSE_ENABLE
@@ -109,5 +109,14 @@ endif
 OPT_DEFS += -DVERSION=$(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
 
 
+ifdef KEYMAP_SECTION_ENABLE
+    OPT_DEFS += -DKEYMAP_SECTION_ENABLE
+    EXTRALDFLAGS = -Wl,-L$(TMK_DIR),-Tldscript_keymap_avr5.x
+endif
+
+# Version string
+OPT_DEFS += -DVERSION=$(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
+
+
 # Search Path
-VPATH += $(TOP_DIR)/common
+VPATH += $(TMK_DIR)/common
