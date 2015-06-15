@@ -340,7 +340,7 @@ ISR(TIMER1_COMPA_vect)
 #ifdef BREATHING_LED_ENABLE
         breathing_led_proc();
 #endif
-#if CUSTOM_LED_ENABLE
+#ifdef CUSTOM_LED_ENABLE
         softpwm_led_custom();
 #endif
     }
