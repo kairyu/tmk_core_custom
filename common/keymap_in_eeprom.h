@@ -50,7 +50,7 @@ typedef struct {
 
 #define KEYMAP_SIZE (sizeof(uint16_t) * FN_ACTIONS_COUNT + sizeof(uint8_t) * KEYS_COUNT)
 #define KEYMAP_WORD_SIZE ((KEYMAP_SIZE + 1) / 2)
-#define KEY_OFFSET(layer, row, col) (layer * matrix_rows() * matrix_cols() + row * matrix_cols() + col)
+#define KEY_OFFSET(layer, row, col) (layer * MATRIX_SIZE + row * matrix_cols() + col)
 
 void keymap_in_eeprom_init(void);
 void keymap_in_eeprom_disable(void);
