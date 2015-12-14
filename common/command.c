@@ -49,6 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   include "usbdrv.h"
 #endif
 
+#ifdef PS2_MOUSE_ENABLE
+extern uint8_t ps2_mouse_enabled;
+#endif
 
 static bool command_common(uint8_t code);
 static void command_common_help(void);
@@ -169,6 +172,10 @@ static void print_eeconfig(void)
     print("backlight_config.raw: "); print_hex8(bc.raw); print("\n");
     print(".enable: "); print_dec(bc.enable); print("\n");
     print(".level: "); print_dec(bc.level); print("\n");
+#endif
+
+#ifdef PS2_MOUSE_ENABLE
+    print("ps2_mouse_enabled: "); print_hex8(ps2_mouse_enabled); print("\n");
 #endif
 }
 #endif
