@@ -76,6 +76,7 @@ endif
 endif
 
 ifdef BACKLIGHT_ENABLE
+    SRC += $(COMMON_DIR)/avr/eeconfig.c
     SRC += $(COMMON_DIR)/backlight.c
     OPT_DEFS += -DBACKLIGHT_ENABLE
 endif
