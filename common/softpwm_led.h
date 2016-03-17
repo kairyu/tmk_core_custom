@@ -8,10 +8,16 @@
 #ifdef SOFTPWM_LED_ENABLE
 
 void softpwm_init(void);
+void softpwm_enable(void);
+void softpwm_disable(void);
+void softpwm_toggle(void);
 void softpwm_led_init(void);
-void softpwm_led_enable(void);
-void softpwm_led_disable(void);
-void softpwm_led_toggle(void);
+void softpwm_led_enable(uint8_t index);
+void softpwm_led_enable_all(void);
+void softpwm_led_disable(uint8_t index);
+void softpwm_led_disable_all(void);
+void softpwm_led_toggle(uint8_t index);
+void softpwm_led_toggle_all(void);
 void softpwm_led_set(uint8_t index, uint8_t val);
 void softpwm_led_set_all(uint8_t val);
 void softpwm_led_increase(uint8_t index, uint8_t offset);
@@ -20,8 +26,7 @@ void softpwm_led_decrease(uint8_t index, uint8_t offset);
 void softpwm_led_decrease_all(uint8_t offset);
 void softpwm_led_on(uint8_t index);
 void softpwm_led_off(uint8_t index);
-uint8_t softpwm_led_get_state(void);
-void softpwm_led_state_change(uint8_t state);
+void softpwm_state_change(uint8_t state);
 
 enum {
     FADING_LED_FADE_IN = 0,
@@ -93,10 +98,16 @@ void breathing_led_custom(uint8_t *value);
 #else
 
 #define softpwm_init()
+#define softpwm_enable()
+#define softpwm_disable()
+#define softpwm_toggle()
 #define softpwm_led_init()
 #define softpwm_led_enable()
+#define softpwm_led_enable_all()
 #define softpwm_led_disable()
+#define softpwm_led_disable_all()
 #define softpwm_led_toggle()
+#define softpwm_led_toggle_all()
 #define softpwm_led_set()
 #define softpwm_led_set_all()
 #define softpwm_led_increase()
@@ -105,8 +116,7 @@ void breathing_led_custom(uint8_t *value);
 #define softpwm_led_decrease_all()
 #define softpwm_led_on()
 #define softpwm_led_off()
-#define softpwm_led_get_state()
-#define softpwm_led_state_change()
+#define softpwm_state_change()
 
 #endif
 

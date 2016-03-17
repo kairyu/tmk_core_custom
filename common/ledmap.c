@@ -11,6 +11,8 @@ static led_binding_t default_layer_binding = 0;
 static led_binding_t layer_binding = 0;
 static led_binding_t backlight_binding = 0;
 static led_binding_t reverse_binding = 0;
+extern uint8_t softpwm_state;
+extern led_pack_t softpwm_led_state;
 
 static void update_led_state(led_state_t state, uint8_t force);
 
@@ -103,13 +105,9 @@ void softpwm_led_off(uint8_t index)
     }
 }
 
-void softpwm_led_state_change(uint8_t state)
+void softpwm_state_change(uint8_t state)
 {
-    if (state) {
-    }
-    else {
-        update_led_state(led_state_last, 1);
-    }
+    update_led_state(led_state_last, 1);
 }
 #endif
 
@@ -118,7 +116,7 @@ void update_led_state(led_state_t state, uint8_t force)
     led_state_t diff = led_state_last ^ state;
     if (force || diff) {
         for (uint8_t i = 0; i < LED_COUNT; i++) {
-            if (softpwm_led_get_state() && (backlight_binding & LED_BIT(i))) {
+            if ((softpwm_led_state & LED_BIT(i)) && (backlight_binding & LED_BIT(i))) {
                 continue;
             }
             if (force || diff & LED_BIT(i)) {

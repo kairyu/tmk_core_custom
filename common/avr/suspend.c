@@ -77,7 +77,7 @@ static void power_down(uint8_t wdto)
 #endif
 
 #ifdef SOFTPWM_LED_ENABLE
-    softpwm_led_disable();
+    softpwm_disable();
 #endif
 
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);

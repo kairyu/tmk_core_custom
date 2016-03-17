@@ -10,7 +10,8 @@
 #endif
 #define SOFTPWM_LED_TIMER_TOP F_CPU / (256 * SOFTPWM_LED_FREQ)
 
-static uint8_t softpwm_led_state = 0;
+uint8_t softpwm_state = 0;
+led_pack_t softpwm_led_state = 0;
 static uint8_t softpwm_led_ocr[LED_COUNT] = {0};
 static uint8_t softpwm_led_ocr_buff[LED_COUNT] = {0};
 
@@ -56,7 +57,7 @@ void softpwm_init(void)
     softpwm_led_init();
 }
 
-void softpwm_led_enable(void)
+void softpwm_enable(void)
 {
     /* Enable Compare Match Interrupt */
 #ifdef SOFTPWM_LED_TIMER3
@@ -66,13 +67,13 @@ void softpwm_led_enable(void)
     TIMSK1 |= (1<<OCIE1A);
     //dprintf("softpwm led on: %u\n", TIMSK1 & (1<<OCIE1A));
 #endif
-    softpwm_led_state = 1;
+    softpwm_state = 1;
 #ifdef LEDMAP_ENABLE
-    softpwm_led_state_change(softpwm_led_state);
+    softpwm_state_change(softpwm_state);
 #endif
 }
 
-void softpwm_led_disable(void)
+void softpwm_disable(void)
 {
     /* Disable Compare Match Interrupt */
 #ifdef SOFTPWM_LED_TIMER3
@@ -82,22 +83,56 @@ void softpwm_led_disable(void)
     TIMSK1 &= ~(1<<OCIE1A);
     //dprintf("softpwm led off: %u\n", TIMSK1 & (1<<OCIE1A));
 #endif
-    softpwm_led_state = 0;
+    softpwm_state = 0;
     for (uint8_t i = 0; i < LED_COUNT; i++) {
         softpwm_led_off(i);
     }
 #ifdef LEDMAP_ENABLE
-    softpwm_led_state_change(softpwm_led_state);
+    softpwm_state_change(softpwm_state);
 #endif
 }
 
-void softpwm_led_toggle(void)
+void softpwm_toggle(void)
 {
-    if (softpwm_led_state) {
-        softpwm_led_disable();
+    if (softpwm_state) {
+        softpwm_disable();
     }
     else {
-        softpwm_led_enable();
+        softpwm_enable();
+    }
+}
+
+void softpwm_led_enable(uint8_t index)
+{
+    LED_BIT_SET(softpwm_led_state, index);
+}
+
+void softpwm_led_enable_all(void)
+{
+    for (uint8_t i = 0; i < LED_COUNT; i++) {
+        LED_BIT_SET(softpwm_led_state, i);
+    }
+}
+
+void softpwm_led_disable(uint8_t index)
+{
+    LED_BIT_CLEAR(softpwm_led_state, index);
+}
+
+void softpwm_led_disable_all(void)
+{
+    softpwm_led_state = 0;
+}
+
+void softpwm_led_toggle(uint8_t index)
+{
+    LED_BIT_XOR(softpwm_led_state, index);
+}
+
+void softpwm_led_toggle_all(void)
+{
+    for (uint8_t i = 0; i < LED_COUNT; i++) {
+        LED_BIT_XOR(softpwm_led_state, i);
     }
 }
 
@@ -145,11 +180,6 @@ void softpwm_led_decrease_all(uint8_t offset)
     for (uint8_t i = 0; i < LED_COUNT; i++) {
         softpwm_led_decrease(i, offset);
     }
-}
-
-inline uint8_t softpwm_led_get_state(void)
-{
-    return softpwm_led_state;
 }
 
 #ifdef FADING_LED_ENABLE
@@ -321,14 +351,16 @@ ISR(TIMER1_COMPA_vect)
     static uint8_t pwm = 0;
     pwm++;
     for (uint8_t i = 0; i < LED_COUNT; i++) {
-        // LED on
-        if (pwm == 0) {
-            if (softpwm_led_ocr[i]) softpwm_led_on(i);
-            softpwm_led_ocr[i] = softpwm_led_ocr_buff[i];
-        }
-        // LED off
-        if (pwm == softpwm_led_ocr[i]) {
-            softpwm_led_off(i);
+        if (softpwm_led_state & LED_BIT(i)) {
+            // LED on
+            if (pwm == 0) {
+                if (softpwm_led_ocr[i]) softpwm_led_on(i);
+                softpwm_led_ocr[i] = softpwm_led_ocr_buff[i];
+            }
+            // LED off
+            if (pwm == softpwm_led_ocr[i]) {
+                softpwm_led_off(i);
+            }
         }
     }
 
