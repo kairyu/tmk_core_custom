@@ -5,7 +5,9 @@
 #include "softpwm_led.h"
 #include "debug.h"
 
+#ifndef SOFTPWM_LED_FREQ
 #define SOFTPWM_LED_FREQ 64
+#endif
 #define SOFTPWM_LED_TIMER_TOP F_CPU / (256 * SOFTPWM_LED_FREQ)
 
 static uint8_t softpwm_led_state = 0;
