@@ -71,6 +71,12 @@ static bool has_ghost_in_row(uint8_t row)
 
 extern uint8_t ps2_mouse_enabled;
 
+__attribute__ ((weak)) void matrix_setup(void) {}
+void keyboard_setup(void)
+{
+    matrix_setup();
+}
+
 void keyboard_init(void)
 {
     timer_init();
