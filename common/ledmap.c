@@ -2,7 +2,7 @@
 #include "ledmap_in_eeprom.h"
 #include "led.h"
 #include "softpwm_led.h"
-#include "action_layer.h"
+#include "hook.h"
 #include "debug.h"
 
 static led_state_t led_state_last = 0;
@@ -11,8 +11,10 @@ static led_binding_t default_layer_binding = 0;
 static led_binding_t layer_binding = 0;
 static led_binding_t backlight_binding = 0;
 static led_binding_t reverse_binding = 0;
+#ifdef SOFTPWM_LED_ENABLE
 extern uint8_t softpwm_state;
 extern led_pack_t softpwm_led_state;
+#endif
 
 static void update_led_state(led_state_t state, uint8_t force);
 
@@ -42,7 +44,7 @@ void ledmap_init(void)
     update_led_state(0, 1);
 }
 
-void led_set(uint8_t usb_led)
+void hook_keyboard_leds_change(uint8_t usb_led)
 {
     if (usb_led_binding) {
         led_state_t led_state = led_state_last;
@@ -57,7 +59,7 @@ void led_set(uint8_t usb_led)
 }
 
 #ifndef NO_ACTION_LAYER
-void default_layer_state_change(uint32_t state)
+void hook_default_layer_change(uint32_t state)
 {
     if (default_layer_binding) {
         led_state_t led_state = led_state_last;
@@ -71,7 +73,7 @@ void default_layer_state_change(uint32_t state)
     }
 }
 
-void layer_state_change(uint32_t state)
+void hook_layer_change(uint32_t state)
 {
     if (layer_binding) {
         led_state_t led_state = led_state_last;
@@ -116,9 +118,11 @@ void update_led_state(led_state_t state, uint8_t force)
     led_state_t diff = led_state_last ^ state;
     if (force || diff) {
         for (uint8_t i = 0; i < LED_COUNT; i++) {
+#ifdef SOFTPWM_LED_ENABLE
             if ((softpwm_led_state & LED_BIT(i)) && (backlight_binding & LED_BIT(i))) {
                 continue;
             }
+#endif
             if (force || diff & LED_BIT(i)) {
                 if ((state ^ reverse_binding) & LED_BIT(i)) {
                     ledmap_led_on(i);

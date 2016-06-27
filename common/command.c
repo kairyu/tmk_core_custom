@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <stdint.h>
 #include <stdbool.h>
-#include <util/delay.h>
+#include "wait.h"
 #include "keycode.h"
 #include "host.h"
 #include "keymap.h"
@@ -100,12 +100,14 @@ bool command_proc(uint8_t code)
 bool command_extra(uint8_t code) __attribute__ ((weak));
 bool command_extra(uint8_t code)
 {
+    (void)code;
     return false;
 }
 
 bool command_console_extra(uint8_t code) __attribute__ ((weak));
 bool command_console_extra(uint8_t code)
 {
+    (void)code;
     return false;
 }
 
@@ -185,7 +187,9 @@ static void print_eeconfig(void)
 
 static bool command_common(uint8_t code)
 {
-    static host_driver_t *host_driver = 0;
+#ifdef KEYBOARD_LOCK_ENABLE
+   static host_driver_t *host_driver = 0;
+#endif
     switch (code) {
 #ifdef SLEEP_LED_ENABLE
         case KC_Z:
@@ -230,7 +234,7 @@ static bool command_common(uint8_t code)
         case KC_PAUSE:
             clear_keyboard();
             print("\n\nbootloader... ");
-            _delay_ms(1000);
+            wait_ms(1000);
             bootloader_jump(); // not return
             break;
         case KC_D:
@@ -290,6 +294,9 @@ static bool command_common(uint8_t code)
 #ifdef PROTOCOL_VUSB
             " VUSB"
 #endif
+#ifdef PROTOCOL_CHIBIOS
+            " CHIBIOS"
+#endif
 #ifdef BOOTMAGIC_ENABLE
             " BOOTMAGIC"
 #endif
@@ -307,9 +314,6 @@ static bool command_common(uint8_t code)
 #endif
 #ifdef NKRO_ENABLE
             " NKRO"
-#endif
-#ifdef USB_6KRO_ENABLE
-            " 6KRO"
 #endif
 #ifdef KEYMAP_SECTION_ENABLE
             " KEYMAP_SECTION"
@@ -335,8 +339,13 @@ static bool command_common(uint8_t code)
             " " STR(BOOTLOADER_SIZE) "\n");
 
             print("GCC: " STR(__GNUC__) "." STR(__GNUC_MINOR__) "." STR(__GNUC_PATCHLEVEL__)
+#if defined(__AVR__)
                   " AVR-LIBC: " __AVR_LIBC_VERSION_STRING__
                   " AVR_ARCH: avr" STR(__AVR_ARCH__) "\n");
+#elif defined(__arm__)
+            // TODO
+            );
+#endif
             break;
         case KC_S:
             print("\n\t- Status -\n");
@@ -346,7 +355,7 @@ static bool command_common(uint8_t code)
 #ifdef NKRO_ENABLE
             print_val_hex8(keyboard_nkro);
 #endif
-            print_val_hex32(timer_count);
+            print_val_hex32(timer_read32());
 
 #ifdef PROTOCOL_PJRC
             print_val_hex8(UDCON);
@@ -366,10 +375,11 @@ static bool command_common(uint8_t code)
         case KC_N:
             clear_keyboard(); //Prevents stuck keys.
             keyboard_nkro = !keyboard_nkro;
-            if (keyboard_nkro)
+            if (keyboard_nkro) {
                 print("NKRO: on\n");
-            else
+            } else {
                 print("NKRO: off\n");
+            }
             break;
 #endif
         case KC_ESC:
@@ -623,10 +633,11 @@ static bool mousekey_console(uint8_t code)
             print("?");
             return false;
     }
-    if (mousekey_param)
+    if (mousekey_param) {
         xprintf("M%d> ", mousekey_param);
-    else
+    } else {
         print("M>" );
+    }
     return true;
 }
 #endif

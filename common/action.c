@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "action_macro.h"
 #include "action_util.h"
 #include "action.h"
+#include "hook.h"
 
 #ifdef DEBUG_ACTION
 #include "debug.h"
@@ -39,11 +40,10 @@ void action_exec(keyevent_t event)
     if (!IS_NOEVENT(event)) {
         dprint("\n---- action_exec: start -----\n");
         dprint("EVENT: "); debug_event(event); dprintln();
+        hook_matrix_change(event);
     }
 
     keyrecord_t record = { .event = event };
-
-    action_keyevent(event);
 
 #ifndef NO_ACTION_TAPPING
     action_tapping_process(record);
@@ -133,10 +133,17 @@ void process_action(keyrecord_t *record)
                     case MODS_TAP_TOGGLE:
                         if (event.pressed) {
                             if (tap_count <= TAPPING_TOGGLE) {
-                                register_mods(mods);
+                                if (mods & get_mods()) {
+                                    dprint("MODS_TAP_TOGGLE: toggle mods off\n");
+                                    unregister_mods(mods);
+                                } else {
+                                    dprint("MODS_TAP_TOGGLE: toggle mods on\n");
+                                    register_mods(mods);
+                                }
                             }
                         } else {
                             if (tap_count < TAPPING_TOGGLE) {
+                                dprint("MODS_TAP_TOGGLE: release : unregister_mods\n");
                                 unregister_mods(mods);
                             }
                         }
@@ -573,9 +580,4 @@ void debug_action(action_t action)
         default:                    dprint("UNKNOWN");               break;
     }
     dprintf("[%X:%02X]", action.kind.param>>8, action.kind.param&0xff);
-}
-
-__attribute__ ((weak))
-void action_keyevent(keyevent_t event)
-{
 }
