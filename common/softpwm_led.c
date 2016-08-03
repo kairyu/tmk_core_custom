@@ -117,11 +117,18 @@ void softpwm_led_enable_all(void)
 void softpwm_led_disable(uint8_t index)
 {
     LED_BIT_CLEAR(softpwm_led_state, index);
+    softpwm_led_off(index);
 }
 
 void softpwm_led_disable_all(void)
 {
     softpwm_led_state = 0;
+    for (uint8_t i = 0; i < LED_COUNT; i++) {
+        softpwm_led_off(i);
+    }
+#ifdef LEDMAP_ENABLE
+    softpwm_state_change(softpwm_state);
+#endif
 }
 
 void softpwm_led_toggle(uint8_t index)
