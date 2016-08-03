@@ -19,9 +19,9 @@ USB_HOST_SHIELD_SRC = \
 #
 ARDUINO_DIR = $(USB_HID_DIR)/arduino-1.0.1
 ARDUINO_CORES_DIR = $(ARDUINO_DIR)/cores/arduino
-ARDUINO_CORES_SRC = \
-	$(ARDUINO_CORES_DIR)/Print.cpp \
-	$(ARDUINO_CORES_DIR)/Stream.cpp
+#ARDUINO_CORES_SRC = \
+#	$(ARDUINO_CORES_DIR)/Print.cpp \
+#	$(ARDUINO_CORES_DIR)/Stream.cpp
 
 # replaced with override_Serial.c
 #	$(ARDUINO_CORES_DIR)/CDC.cpp \
@@ -39,7 +39,7 @@ ARDUINO_CORES_SRC = \
 SRC += $(USB_HID_DIR)/parser.cpp
 
 # replace arduino/CDC.cpp
-SRC += $(USB_HID_DIR)/override_Serial.cpp
+#SRC += $(USB_HID_DIR)/override_Serial.cpp
 
 # replace arduino/wiring.c
 SRC += $(USB_HID_DIR)/override_wiring.c

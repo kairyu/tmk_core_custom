@@ -15,3 +15,15 @@ void KBDReportParser::Parse(HID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf)
     }
     dprint("\r\n");
 }
+
+void MOUSEReportParser::Parse(HID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf)
+{
+    ::memcpy(&report, buf, sizeof(report_mouse_t));
+    time_stamp = millis();
+
+    dprintf("mouse input:");
+    for (uint8_t i = 0; i < len; i++) {
+        dprintf(" %02X", buf[i]);
+    }
+    dprint("\r\n");
+}
