@@ -48,9 +48,15 @@ void backlight_increase(void)
         backlight_config.level++;
         backlight_config.enable = 1;
         eeconfig_write_backlight(backlight_config.raw);
+#ifdef REDUCE_CALLBACK_ON_LEVEL_CHANGE
+        dprintf("backlight increase: %u\n", backlight_config.level);
+        backlight_set(backlight_config.level);
+    }
+#else
     }
     dprintf("backlight increase: %u\n", backlight_config.level);
     backlight_set(backlight_config.level);
+#endif
 #endif
 }
 
@@ -72,9 +78,15 @@ void backlight_decrease(void)
         backlight_config.level--;
         backlight_config.enable = !!backlight_config.level;
         eeconfig_write_backlight(backlight_config.raw);
+#ifdef REDUCE_CALLBACK_ON_LEVEL_CHANGE
+        dprintf("backlight decrease: %u\n", backlight_config.level);
+        backlight_set(backlight_config.level);
+    }
+#else
     }
     dprintf("backlight decrease: %u\n", backlight_config.level);
     backlight_set(backlight_config.level);
+#endif
 #endif
 }
 
