@@ -86,11 +86,19 @@ void process_action(keyrecord_t *record)
                     }
                     register_code(action.key.code);
                 } else {
+#ifndef REVERSE_MODIFIED_KEY_RELEASE_SEQUENCE
                     unregister_code(action.key.code);
                     if (mods) {
                         del_weak_mods(mods);
                         send_keyboard_report();
                     }
+#else
+                    if (mods) {
+                        del_weak_mods(mods);
+                        send_keyboard_report();
+                    }
+                    unregister_code(action.key.code);
+#endif
                 }
             }
             break;
