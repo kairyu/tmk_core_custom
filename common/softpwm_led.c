@@ -305,11 +305,13 @@ void breathing_led_enable_all(void)
 void breathing_led_disable(uint8_t index)
 {
     LED_BIT_CLEAR(breathing_led_state, index);
+    LED_BIT_CLEAR(breathing_led_once, index);
 }
 
 void breathing_led_disable_all(void)
 {
     breathing_led_state = 0;
+    breathing_led_once = 0;
 }
 
 void breathing_led_toggle(uint8_t index)
