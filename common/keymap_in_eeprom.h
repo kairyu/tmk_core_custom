@@ -22,10 +22,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "ledmap_in_eeprom.h"
 
 #ifndef EECONFIG_KEYMAP_IN_EEPROM
-#define EECONFIG_KEYMAP_IN_EEPROM 0x10
+#   ifdef EECONFIG_LEDMAP_IN_EEPROM_END
+#       define EECONFIG_KEYMAP_IN_EEPROM    EECONFIG_LEDMAP_IN_EEPROM_END
+#   else
+#       define EECONFIG_KEYMAP_IN_EEPROM    EECONFIG_END
+#   endif
 #endif
+
+#ifdef KEYMAP_IN_EEPROM_ENABLE
+#   define EECONFIG_KEYMAP_IN_EEPROM_END
+#else
+#   define EECONFIG_KEYMAP_IN_EEPROM_END
+#endif
+
+#ifdef DEBUG
+#   ifndef VALUE_TO_STRING
+#       define VALUE_TO_STRING(x) #x
+#       define VALUE(x) VALUE_TO_STRING(x)
+#       define VAR_NAME_VALUE(var) #var "="  VALUE(var)
+#   endif
+#   ifndef MESSAGE_EECONFIG_KEYMAP_IN_EEPROM
+#       define MESSAGE_EECONFIG_KEYMAP_IN_EEPROM
+#       pragma message(VAR_NAME_VALUE(EECONFIG_KEYMAP_IN_EEPROM))
+#   endif
+#endif
+
 #ifndef FN_ACTIONS_COUNT
 #define FN_ACTIONS_COUNT 32
 #endif

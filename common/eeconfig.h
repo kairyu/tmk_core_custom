@@ -30,8 +30,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EECONFIG_DEFAULT_LAYER                      (uint8_t *)3
 #define EECONFIG_KEYMAP                             (uint8_t *)4
 #define EECONFIG_MOUSEKEY_ACCEL                     (uint8_t *)5
-#define EECONFIG_BACKLIGHT                          (uint8_t *)6
-#define EECONFIG_PS2_MOUSE                          (uint8_t *)7
+
+#ifdef PS2_MOUSE_ENABLE
+#   define EECONFIG_PS2_MOUSE                       (uint8_t *)6
+#else
+#   define EECONFIG_PS2_MOUSE                       (uint8_t *)5
+#endif
+
+#define EECONFIG_BOOTMAGIC_END                      EECONFIG_PS2_MOUSE + 1
+
+#define EECONFIG_BACKLIGHT                          EECONFIG_BOOTMAGIC_END
+#ifdef BACKLIGHT_ENABLE
+#   define EECONFIG_BACKLIGHT_END                   EECONFIG_BACKLIGHT + 1
+#else
+#   define EECONFIG_BACKLIGHT_END                   EECONFIG_BACKLIGHT
+#endif
+
+#define EECONFIG_END                                EECONFIG_BACKLIGHT_END
 
 
 /* debug bit */
@@ -70,14 +85,15 @@ void eeconfig_write_default_layer(uint8_t val);
 uint8_t eeconfig_read_keymap(void);
 void eeconfig_write_keymap(uint8_t val);
 
+#ifdef PS2_MOUSE_ENABLE
+uint8_t eeconfig_read_ps2_mouse(void);
+void eeconfig_write_ps2_mouse(uint8_t val);
+#endif
+
 #ifdef BACKLIGHT_ENABLE
 uint8_t eeconfig_read_backlight(void);
 void eeconfig_write_backlight(uint8_t val);
 #endif
 
-#ifdef PS2_MOUSE_ENABLE
-uint8_t eeconfig_read_ps2_mouse(void);
-void eeconfig_write_ps2_mouse(uint8_t val);
-#endif
 
 #endif

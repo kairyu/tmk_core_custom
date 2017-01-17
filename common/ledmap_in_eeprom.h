@@ -1,18 +1,33 @@
 #ifndef LEDMAP_IN_EEPROM_H
 #define LEDMAP_IN_EEPROM_H
 
+#include "eeconfig.h"
 #include "ledmap.h"
 
+#define LEDMAP_SIZE (sizeof(uint16_t) * LED_COUNT)
 #ifndef EECONFIG_LEDMAP_IN_EEPROM
-#ifdef PS2_MOUSE_ENABLE
-#define EECONFIG_LEDMAP_IN_EEPROM 8
-#else
-#define EECONFIG_LEDMAP_IN_EEPROM 7
-#endif
+#   define EECONFIG_LEDMAP_IN_EEPROM        EECONFIG_END
 #endif
 
-#define EECONFIG_LEDMAP (uint16_t*)EECONFIG_LEDMAP_IN_EEPROM
-#define LEDMAP_SIZE (sizeof(uint16_t) * LED_COUNT)
+#ifdef LEDMAP_IN_EEPROM_ENABLE
+#   define EECONFIG_LEDMAP_IN_EEPROM_END    EECONFIG_LEDMAP_IN_EEPROM + LEDMAP_SIZE
+#else
+#   define EECONFIG_LEDMAP_IN_EEPROM_END    EECONFIG_LEDMAP_IN_EEPROM
+#endif
+
+#ifdef DEBUG
+#   ifndef VALUE_TO_STRING
+#       define VALUE_TO_STRING(x) #x
+#       define VALUE(x) VALUE_TO_STRING(x)
+#       define VAR_NAME_VALUE(var) #var "="  VALUE(var)
+#   endif
+#   ifndef MESSAGE_EECONFIG_LEDMAP_IN_EEPROM
+#       define MESSAGE_EECONFIG_LEDMAP_IN_EEPROM
+#       pragma message(VAR_NAME_VALUE(EECONFIG_LEDMAP_IN_EEPROM))
+#   endif
+#endif
+
+#define EECONFIG_LEDMAP (uint16_t*)(EECONFIG_LEDMAP_IN_EEPROM)
 
 #define LEDMAP_UNCONFIGURED 0xFFFF
 
