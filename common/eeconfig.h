@@ -46,7 +46,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   define EECONFIG_BACKLIGHT_END                   EECONFIG_BACKLIGHT
 #endif
 
-#define EECONFIG_END                                EECONFIG_BACKLIGHT_END
+#define EECONFIG_RGB_LED                            EECONFIG_BACKLIGHT_END
+#define EECONFIG_RGB_LED_BRIGHTNESS                 EECONFIG_RGB_LED + 1
+#ifdef RGB_LED_ENABLE
+#   define EECONFIG_RGB_LED_END                     EECONFIG_RGB_LED + 2
+#else
+#   define EECONFIG_RGB_LED_END                     EECONFIG_RGB_LED
+#endif
+
+#define EECONFIG_END                                EECONFIG_RGB_LED_END
 
 
 /* debug bit */
@@ -95,5 +103,12 @@ uint8_t eeconfig_read_backlight(void);
 void eeconfig_write_backlight(uint8_t val);
 #endif
 
+#ifdef RGB_LED_ENABLE
+uint8_t eeconfig_read_rgb_led(void);
+void eeconfig_write_rgb_led(uint8_t val);
+
+uint8_t eeconfig_read_rgb_led_brightness(void);
+void eeconfig_write_rgb_led_brightness(uint8_t val);
+#endif
 
 #endif

@@ -4,6 +4,9 @@
 #include "led.h"
 #include "softpwm_led.h"
 #include "debug.h"
+#ifdef RGB_LED_ENABLE
+#include "rgb_led.h"
+#endif
 
 #ifndef SOFTPWM_LED_FREQ
 #define SOFTPWM_LED_FREQ 64
@@ -385,6 +388,9 @@ ISR(TIMER1_COMPA_vect)
 #endif
 #ifdef CUSTOM_LED_ENABLE
         softpwm_led_custom();
+#endif
+#ifdef RGB_LED_ENABLE
+        rgb_led_fading();
 #endif
     }
 #endif

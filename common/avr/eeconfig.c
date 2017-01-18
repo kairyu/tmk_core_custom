@@ -16,6 +16,10 @@ void eeconfig_init(void)
 #ifdef BACKLIGHT_ENABLE
     eeprom_write_byte(EECONFIG_BACKLIGHT,      0);
 #endif
+#ifdef RGB_LED_ENABLE
+    eeprom_write_byte(EECONFIG_RGB_LED,        0);
+    eeprom_write_byte(EECONFIG_RGB_LED_BRIGHTNESS, 0);
+#endif
 }
 
 void eeconfig_enable(void)
@@ -52,3 +56,10 @@ uint8_t eeconfig_read_backlight(void)      { return eeprom_read_byte(EECONFIG_BA
 void eeconfig_write_backlight(uint8_t val) { eeprom_write_byte(EECONFIG_BACKLIGHT, val); }
 #endif
 
+#ifdef RGB_LED_ENABLE
+uint8_t eeconfig_read_rgb_led(void)      { return eeprom_read_byte(EECONFIG_RGB_LED); }
+void eeconfig_write_rgb_led(uint8_t val) { eeprom_write_byte(EECONFIG_RGB_LED, val); }
+
+uint8_t eeconfig_read_rgb_led_brightness(void)      { return eeprom_read_byte(EECONFIG_RGB_LED_BRIGHTNESS); }
+void eeconfig_write_rgb_led_brightness(uint8_t val) { eeprom_write_byte(EECONFIG_RGB_LED_BRIGHTNESS, val); }
+#endif

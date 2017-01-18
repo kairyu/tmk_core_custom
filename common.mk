@@ -86,6 +86,14 @@ ifdef BREATHING_LED_ENABLE
 endif
 endif
 
+ifdef RGB_LED_ENABLE
+    SRC += $(COMMON_DIR)/avr/eeconfig.c
+    SRC += $(COMMON_DIR)/avr/light_ws2812.c
+    SRC += $(COMMON_DIR)/rgb_led.c
+    OPT_DEFS += -DRGB_LED_ENABLE
+    OPT_DEFS += -DRGB_LED_WS2812
+endif
+
 ifdef BACKLIGHT_ENABLE
     SRC += $(COMMON_DIR)/avr/eeconfig.c
     SRC += $(COMMON_DIR)/backlight.c

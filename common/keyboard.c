@@ -32,9 +32,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "backlight.h"
 #include "hook.h"
 #ifdef SOFTPWM_LED_ENABLE
-#include "softpwm_led.h"
+#   include "softpwm_led.h"
 #else
-#include "breathing_led.h"
+#   include "breathing_led.h"
+#endif
+#ifdef RGB_LED_ENABLE
+#   include "rgb_led.h"
 #endif
 #include "ledmap.h"
 #include "ledmap_in_eeprom.h"
@@ -46,9 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   include "ps2_mouse.h"
 #endif
 #ifdef SERIAL_MOUSE_ENABLE
-#include "serial_mouse.h"
+#   include "serial_mouse.h"
 #endif
-#ifdef ADB_MOUSE_ENABLE
+#   ifdef ADB_MOUSE_ENABLE
 #include "adb.h"
 #endif
 
@@ -121,6 +124,10 @@ void keyboard_init(void)
 
 #ifdef BACKLIGHT_ENABLE
     backlight_init();
+#endif
+
+#ifdef RGB_LED_ENABLE
+    rgb_led_init();
 #endif
 
 #ifdef KEYMAP_IN_EEPROM_ENABLE
