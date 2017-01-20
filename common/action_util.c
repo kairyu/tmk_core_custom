@@ -197,11 +197,11 @@ uint8_t get_first_key(void)
 #ifdef DEBUG
 static void dump_report_keys(void) {
     dprintf("\n");
-    for (uint8_t i = 0; i < REPORT_KEYS; i++) {
+    for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
         dprintf("%02X ", keyboard_report->keys[i]);
     }
     dprintf("\n");
-    for (uint8_t i = 0; i < REPORT_KEYS; i++) {
+    for (uint8_t i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
         dprintf("%c%c ", i==cb_head?'H':' ', i==cb_tail?'T':' ');
     }
     dprintf("\n");
