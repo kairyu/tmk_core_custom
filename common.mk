@@ -126,6 +126,11 @@ ifdef KEYMAP_SECTION_ENABLE
     endif
 endif
 
+ifdef RAWHID_ENABLE
+    SRC += $(COMMON_DIR)/rawhid_command.c
+    OPT_DEFS += -DRAWHID_ENABLE
+endif
+
 # Version string
 VERSION := $(shell (git describe --always --dirty || echo 'unknown') 2> /dev/null)
 OPT_DEFS += -DVERSION=$(VERSION)

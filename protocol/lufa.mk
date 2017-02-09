@@ -30,6 +30,23 @@ VPATH += $(TMK_DIR)/$(LUFA_PATH)
 #ifdef EXTRAKEY_ENABLE
 #endif
 
+ifdef RAWHID_ENABLE
+    SRC += $(TMK_DIR)/protocol/rawhid.c
+    SRC += $(TMK_DIR)/protocol/console_ring_buffer.c
+endif
+
+# Search Path
+VPATH += $(TMK_DIR)/$(LUFA_DIR)
+VPATH += $(TMK_DIR)/$(LUFA_PATH)
+VPATH += $(TMK_DIR)/protocol
+
+# Option modules
+#ifdef $(or MOUSEKEY_ENABLE, PS2_MOUSE_ENABLE)
+#endif
+
+#ifdef EXTRAKEY_ENABLE
+#endif
+
 # LUFA library compile-time options and predefined tokens
 LUFA_OPTS  = -DUSB_DEVICE_ONLY
 LUFA_OPTS += -DORDERED_EP_CONFIG

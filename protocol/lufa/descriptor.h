@@ -71,7 +71,7 @@ typedef struct
     USB_Descriptor_Endpoint_t             Extrakey_INEndpoint;
 #endif
 
-#ifdef CONSOLE_ENABLE
+#if defined(CONSOLE_ENABLE) || defined(RAWHID_ENABLE)
     // Console HID Interface
     USB_Descriptor_Interface_t            Console_Interface;
     USB_HID_Descriptor_HID_t              Console_HID;
@@ -135,9 +135,9 @@ typedef struct
 #   define EXTRAKEY_IN_EPNUM        MOUSE_IN_EPNUM 
 #endif
 
-#ifdef CONSOLE_ENABLE
+#if defined(CONSOLE_ENABLE) || defined (RAWHID_ENABLE)
 #   define CONSOLE_IN_EPNUM         (EXTRAKEY_IN_EPNUM + 1)
-#   define CONSOLE_OUT_EPNUM        (EXTRAKEY_IN_EPNUM + 1)
+#   define CONSOLE_OUT_EPNUM        (CONSOLE_IN_EPNUM + 1)
 //#   define CONSOLE_OUT_EPNUM        (EXTRAKEY_IN_EPNUM + 2)
 #else
 #   define CONSOLE_OUT_EPNUM        EXTRAKEY_IN_EPNUM
