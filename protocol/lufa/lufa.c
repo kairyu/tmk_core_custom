@@ -52,6 +52,10 @@
 
 #include "descriptor.h"
 #include "lufa.h"
+#ifdef RAWHID_ENABLE
+#include "rawhid.h"
+#include "console_ring_buffer.h"
+#endif
 
 uint8_t keyboard_idle = 0;
 /* 0: Boot Protocol, 1: Report Protocol(default) */
@@ -79,7 +83,21 @@ host_driver_t lufa_driver = {
 /*******************************************************************************
  * Console
  ******************************************************************************/
-#ifdef CONSOLE_ENABLE
+#if defined(RAWHID_ENABLE) && defined(CONSOLE_ENABLE)
+static void Console_Task(void)
+{
+    //TODO: ACK/NACK
+    /* Device must be connected and configured for the task to run */
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
+
+    /* USING RawHID for console data */
+    receiveRawHidData();
+    rbuf_clear();
+    return;
+}
+
+#elif defined(CONSOLE_ENABLE)
 static void Console_Task(void)
 {
     /* Device must be connected and configured for the task to run */
@@ -87,6 +105,9 @@ static void Console_Task(void)
         return;
 
     uint8_t ep = Endpoint_GetCurrentEndpoint();
+    /* Device must be connected and configured for the task to run */
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
 
 #if 0
     // TODO: impl receivechar()/recvchar()
@@ -107,7 +128,6 @@ static void Console_Task(void)
             /* Process Console Report Data */
             //ProcessConsoleHIDReport(ConsoleData);
         }
-
         /* Finalize the stream transfer to send the last packet */
         Endpoint_ClearOUT();
     }
@@ -130,6 +150,18 @@ static void Console_Task(void)
     }
 
     Endpoint_SelectEndpoint(ep);
+}
+#elif defined(RAWHID_ENABLE)
+static void Console_Task(void)
+{
+    //TODO: ACK/NACK
+    /* Device must be connected and configured for the task to run */
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+        return;
+
+    /* USING RawHID for console data */
+    receiveRawHidData();
+    return;
 }
 #else
 static void Console_Task(void)
@@ -189,25 +221,26 @@ void EVENT_USB_Device_WakeUp()
     print("[W]");
     hook_usb_wakeup();
 }
-
+/*
 #ifdef CONSOLE_ENABLE
 static bool console_flush = false;
 #define CONSOLE_FLUSH_SET(b)   do { \
     uint8_t sreg = SREG; cli(); console_flush = b; SREG = sreg; \
 } while (0)
-
+*/
 // called every 1ms
 void EVENT_USB_Device_StartOfFrame(void)
 {
+    /*
     static uint8_t count;
     if (++count % 50) return;
     count = 0;
-
-    if (!console_flush) return;
+    */
+    //if (!console_flush) return;
     Console_Task();
-    console_flush = false;
+    //console_flush = false;
 }
-#endif
+//#endif
 
 /** Event handler for the USB_ConfigurationChanged event.
  * This is fired when the host sets the current configuration of the USB device after enumeration.
@@ -235,14 +268,12 @@ void EVENT_USB_Device_ConfigurationChanged(void)
                                      EXTRAKEY_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
-#ifdef CONSOLE_ENABLE
+#if defined(CONSOLE_ENABLE) || defined(RAWHID_ENABLE)
     /* Setup Console HID Report Endpoints */
     ConfigSuccess &= ENDPOINT_CONFIG(CONSOLE_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      CONSOLE_EPSIZE, ENDPOINT_BANK_SINGLE);
-#if 0
     ConfigSuccess &= ENDPOINT_CONFIG(CONSOLE_OUT_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_OUT,
                                      CONSOLE_EPSIZE, ENDPOINT_BANK_SINGLE);
-#endif
 #endif
 
 #ifdef NKRO_ENABLE
@@ -490,7 +521,13 @@ static void send_consumer(uint16_t data)
 /*******************************************************************************
  * sendchar
  ******************************************************************************/
-#ifdef CONSOLE_ENABLE
+#if defined(RAWHID_ENABLE) && defined(CONSOLE_ENABLE)
+#define SEND_TIMEOUT 5
+int8_t sendchar(uint8_t c)
+{
+    return rawhid_send_char(c, SEND_TIMEOUT);
+}
+#elif defined(CONSOLE_ENABLE)
 #define SEND_TIMEOUT 5
 int8_t sendchar(uint8_t c)
 {
@@ -500,7 +537,6 @@ int8_t sendchar(uint8_t c)
 
     // prevents Console_Task() from running during sendchar() runs.
     // or char will be lost. These two function is mutually exclusive.
-    CONSOLE_FLUSH_SET(false);
 
     if (USB_DeviceState != DEVICE_STATE_Configured)
         return -1;
@@ -538,8 +574,6 @@ int8_t sendchar(uint8_t c)
     if (!Endpoint_IsReadWriteAllowed()) {
         while (!(Endpoint_IsINReady()));
         Endpoint_ClearIN();
-    } else {
-        CONSOLE_FLUSH_SET(true);
     }
 
     Endpoint_SelectEndpoint(ep);
