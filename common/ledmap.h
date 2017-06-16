@@ -50,7 +50,8 @@ typedef union {
 #define LEDMAP_ACTIVE_LEVEL         (1<<14)
 #define LEDMAP_ACTIVE_LOW           (LEDMAP_ACTIVE_LEVEL_LOW<<14)
 #define LEDMAP_ACTIVE_HIGH          (LEDMAP_ACTIVE_LEVEL_HIGH<<14)
-#define LEDMAP_RGB                  (1<<15)
+#define LEDMAP_RGB_LED              (1<<15)
+#define LEDMAP_RGB_LED_COUNT(count) (count & 0xFF)
 
 void ledmap_init(void);
 
