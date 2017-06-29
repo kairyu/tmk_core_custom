@@ -71,7 +71,7 @@ ifdef SLEEP_LED_ENABLE
 endif
 
 ifdef SOFTPWM_LED_ENABLE
-    SRC += $(COMMON_DIR)/softpwm_led.c
+    SRC += $(COMMON_DIR)/avr/softpwm_led.c
     OPT_DEFS += -DSOFTPWM_LED_ENABLE
 ifdef FADING_LED_ENABLE
     OPT_DEFS += -DFADING_LED_ENABLE

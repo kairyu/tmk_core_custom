@@ -1,3 +1,20 @@
+/*
+Copyright 2017 Kai Ryu <kai1103@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -13,7 +30,7 @@
 #endif
 #define SOFTPWM_LED_TIMER_TOP F_CPU / (256 * SOFTPWM_LED_FREQ)
 
-uint8_t softpwm_state = 0;
+static uint8_t softpwm_state = SOFTPWM_STATE_UNINIT;
 led_pack_t softpwm_led_state = 0;
 static uint8_t softpwm_led_ocr[LED_COUNT] = {0};
 static uint8_t softpwm_led_ocr_buff[LED_COUNT] = {0};
@@ -58,49 +75,54 @@ void softpwm_init(void)
     SREG = sreg;
 #endif
     softpwm_led_init();
+    softpwm_state = SOFTPWM_STATE_DISABLED;
 }
 
 void softpwm_enable(void)
 {
+    if (softpwm_state == SOFTPWM_STATE_UNINIT) return;
     /* Enable Compare Match Interrupt */
 #ifdef SOFTPWM_LED_TIMER3
-    TIMSK3 |= (1<<OCIE3A);
-    //dprintf("softpwm led on: %u\n", TIMSK3 & (1<<OCIE3A));
+    if (OCR3A) {
+        TIMSK3 |= (1<<OCIE3A);
 #else
-    TIMSK1 |= (1<<OCIE1A);
-    //dprintf("softpwm led on: %u\n", TIMSK1 & (1<<OCIE1A));
+    if (OCR1A) {
+        TIMSK1 |= (1<<OCIE1A);
 #endif
-    softpwm_state = 1;
+        softpwm_state = SOFTPWM_STATE_ENABLED;
 #ifdef LEDMAP_ENABLE
-    softpwm_state_change(softpwm_state);
+        softpwm_state_change(softpwm_state);
 #endif
+    }
 }
 
 void softpwm_disable(void)
 {
+    if (softpwm_state == SOFTPWM_STATE_UNINIT) return;
     /* Disable Compare Match Interrupt */
 #ifdef SOFTPWM_LED_TIMER3
-    TIMSK3 &= ~(1<<OCIE3A);
-    //dprintf("softpwm led off: %u\n", TIMSK3 & (1<<OCIE3A));
+    if (OCR3A) {
+        TIMSK3 &= ~(1<<OCIE3A);
 #else
-    TIMSK1 &= ~(1<<OCIE1A);
-    //dprintf("softpwm led off: %u\n", TIMSK1 & (1<<OCIE1A));
+    if (OCR1A) {
+        TIMSK1 &= ~(1<<OCIE1A);
 #endif
-    softpwm_state = 0;
-    for (uint8_t i = 0; i < LED_COUNT; i++) {
-        softpwm_led_off(i);
-    }
+        softpwm_state = SOFTPWM_STATE_DISABLED;
+        for (uint8_t i = 0; i < LED_COUNT; i++) {
+            softpwm_led_off(i);
+        }
 #ifdef LEDMAP_ENABLE
-    softpwm_state_change(softpwm_state);
+        softpwm_state_change(softpwm_state);
 #endif
+    }
 }
 
 void softpwm_toggle(void)
 {
-    if (softpwm_state) {
+    if (softpwm_state == SOFTPWM_STATE_ENABLED) {
         softpwm_disable();
     }
-    else {
+    else if (softpwm_state == SOFTPWM_STATE_DISABLED) {
         softpwm_enable();
     }
 }
@@ -120,18 +142,22 @@ void softpwm_led_enable_all(void)
 void softpwm_led_disable(uint8_t index)
 {
     LED_BIT_CLEAR(softpwm_led_state, index);
-    softpwm_led_off(index);
+    if (softpwm_state != SOFTPWM_STATE_UNINIT) {
+        softpwm_led_off(index);
+    }
 }
 
 void softpwm_led_disable_all(void)
 {
     softpwm_led_state = 0;
-    for (uint8_t i = 0; i < LED_COUNT; i++) {
-        softpwm_led_off(i);
-    }
+    if (softpwm_state != SOFTPWM_STATE_UNINIT) {
+        for (uint8_t i = 0; i < LED_COUNT; i++) {
+            softpwm_led_off(i);
+        }
 #ifdef LEDMAP_ENABLE
-    softpwm_state_change(softpwm_state);
+        softpwm_state_change(softpwm_state);
 #endif
+    }
 }
 
 void softpwm_led_toggle(uint8_t index)
@@ -364,12 +390,12 @@ ISR(TIMER1_COMPA_vect)
     pwm++;
     for (uint8_t i = 0; i < LED_COUNT; i++) {
         if (softpwm_led_state & LED_BIT(i)) {
-            // LED on
+            /* LED on */
             if (pwm == 0) {
                 if (softpwm_led_ocr[i]) softpwm_led_on(i);
                 softpwm_led_ocr[i] = softpwm_led_ocr_buff[i];
             }
-            // LED off
+            /* LED off */
             if (pwm == softpwm_led_ocr[i]) {
                 softpwm_led_off(i);
             }
