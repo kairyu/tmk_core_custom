@@ -2,6 +2,12 @@
 #include <stdbool.h>
 #include <avr/eeprom.h>
 #include "eeconfig.h"
+#ifdef BACKLIGHT_ENABLE
+#include "backlight.h"
+#endif
+#ifdef RGB_LED_ENABLE
+#include "rgb_led.h"
+#endif
 
 void eeconfig_init(void)
 {
@@ -14,11 +20,11 @@ void eeconfig_init(void)
     eeprom_write_byte(EECONFIG_PS2_MOUSE,      0);
 #endif
 #ifdef BACKLIGHT_ENABLE
-    eeprom_write_byte(EECONFIG_BACKLIGHT,      0);
+    eeprom_write_byte(EECONFIG_BACKLIGHT,      backlight_config_default.raw);
 #endif
 #ifdef RGB_LED_ENABLE
-    eeprom_write_byte(EECONFIG_RGB_LED,        0);
-    eeprom_write_byte(EECONFIG_RGB_LED_BRIGHTNESS, 0);
+    eeprom_write_byte(EECONFIG_RGB_LED,        rgb_led_config_default.raw);
+    eeprom_write_byte(EECONFIG_RGB_LED_BRIGHTNESS, rgb_led_brightness_default);
 #endif
 }
 

@@ -19,6 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "eeconfig.h"
 #include "debug.h"
 
+const backlight_config_t backlight_config_default = {
+    .enable = BACKLIGHT_CONFIG_DEFAULT_ENABLE,
+    .level = BACKLIGHT_CONFIG_DEFAULT_LEVEL
+};
 backlight_config_t backlight_config;
 
 void backlight_init(void)

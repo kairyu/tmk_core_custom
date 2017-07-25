@@ -52,13 +52,27 @@ enum {
     RGB_LED_LEVELS = RGB_LED_RAINBOW
 };
 
-#define RGB_LED_UNCONFIGURED 0xFF
+const rgb_led_config_t rgb_led_config_default;
+const uint8_t rgb_led_brightness_default;
+
 #ifndef RGB_LED_MAX_COUNT
 #define RGB_LED_MAX_COUNT 32
 #endif
 
 #define RGB_LED_BRIGHTNESS_MIN 15
 #define RGB_LED_BRIGHTNESS_MAX 255
+
+#ifndef RGB_LED_CONFIG_DEFAULT_LEVEL
+#define RGB_LED_CONFIG_DEFAULT_LEVEL RGB_LED_OFF
+#endif
+
+#ifndef RGB_LED_CONFIG_DEFAULT_ENABLE
+#define RGB_LED_CONFIG_DEFAULT_ENABLE false
+#endif
+
+#ifndef RGB_LED_BRIGHTNESS_DEFAULT_VALUE
+#define RGB_LED_BRIGHTNESS_DEFAULT_VALUE RGB_LED_BRIGHTNESS_MIN
+#endif
 
 #ifdef RGB_LED_ENABLE
 void rgb_led_init(void);

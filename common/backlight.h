@@ -29,6 +29,16 @@ typedef union {
     };
 } backlight_config_t;
 
+const backlight_config_t backlight_config_default;
+
+#ifndef BACKLIGHT_CONFIG_DEFAULT_ENABLE
+#define BACKLIGHT_CONFIG_DEFAULT_ENABLE false
+#endif
+
+#ifndef BACKLIGHT_CONFIG_DEFAULT_LEVEL
+#define BACKLIGHT_CONFIG_DEFAULT_LEVEL 1
+#endif
+
 void backlight_init(void);
 void backlight_increase(void);
 void backlight_decrease(void);

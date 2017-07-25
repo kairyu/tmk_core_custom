@@ -27,6 +27,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 volatile static uint8_t rgb_led_fading_enable = 0;
 static uint8_t rgb_led_initialized = 0;
+const rgb_led_config_t rgb_led_config_default = {
+    .level = RGB_LED_CONFIG_DEFAULT_LEVEL,
+    .enable = RGB_LED_CONFIG_DEFAULT_ENABLE
+};
+const uint8_t rgb_led_brightnes_default = RGB_LED_BRIGHTNESS_DEFAULT_VALUE;
 static rgb_led_config_t rgb_led_config;
 static rgb_t rgb_led_colors[RGB_LED_MAX_COUNT];
 static hsb_t rgb_led_hsb;
